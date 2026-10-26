@@ -1,59 +1,73 @@
 # SecurityFirmWebApi
 
-API REST pentru gestionarea agenților de pază, realizat cu ASP.NET Core Minimal APIs și SQL Server.
+ASP.NET Core Minimal API for managing security guards, backed by SQL Server.
 
-## Cerințe
+## Requirements
 
-- .NET SDK 10
-- SQL Server accesibil din aplicație
-- O bază de date numită `FirmaSecuritate`, cu tabelul `Agenti_de_Paza`
+- .NET 10 SDK
+- SQL Server
+- `sqlcmd` (to run the database setup script)
 
-Tabelul trebuie să conțină coloanele `ID_Agent`, `Nume_Complet`, `Telefon` și `Salariu`. `ID_Agent` este identificatorul folosit de API.
+## Setup and run
 
-## Configurare
-
-1. Copiază `appsettings.example.json` în `appsettings.json`.
-2. Înlocuiește valoarea `Server=localhost` din `ConnectionStrings:DefaultConnection` cu serverul tău SQL Server.
-3. Configurează autentificarea potrivită mediului tău. Exemplul folosește autentificarea Windows (`Trusted_Connection=True`).
-4. Creează baza de date și tabelul necesar înainte de a porni API-ul.
-
-Fișierele locale `appsettings.json` și `appsettings.Development.json` nu sunt incluse în Git, pentru a evita publicarea configurațiilor specifice mediului.
-
-## Pornire
-
-Din directorul `SecurityApi`:
+Run these commands from the repository root:
 
 ```powershell
-dotnet restore
-dotnet run
+sqlcmd -S localhost -E -i .\schema.sql
+Copy-Item .\appsettings.example.json .\appsettings.json
 ```
 
-În profilul local HTTP, API-ul este disponibil la `http://localhost:5185`. În mediul de dezvoltare, documentația Swagger este disponibilă la `/swagger`.
+Update `ConnectionStrings:DefaultConnection` in `appsettings.json` for your SQL Server, then start the API:
 
-## Endpoint-uri
+```powershell
+dotnet restore .\SecurityApi.csproj
+dotnet run --project .\SecurityApi.csproj
+```
+
+The HTTP launch profile uses `http://localhost:5185`. In Development, Swagger UI is available at `http://localhost:5185/swagger`.
+
+## Endpoints
+
+| Method | Route | Description |
+| --- | --- | --- |
+| `GET` | `/agenti` | List all agents. |
+| `GET` | `/agenti/{id}` | Get one agent. |
+| `POST` | `/agenti` | Create an agent (`201 Created`, with a `Location` header). |
+| `PUT` | `/agenti/{id}` | Replace an agent's details. |
+| `DELETE` | `/agenti/{id}` | Delete an agent (`204 No Content`). |
+
+Create and update requests use JSON properties `nume_Complet`, `telefon`, and `salariu`. Input is validated; errors use Problem Details. See [SecurityApi.http](./SecurityApi.http) for sample requests.
+
+## Română
+
+API REST pentru gestionarea agenților de pază, realizat cu ASP.NET Core Minimal APIs și SQL Server.
+
+### Configurare și pornire
+
+Rulează comenzile din rădăcina depozitului:
+
+```powershell
+sqlcmd -S localhost -E -i .\schema.sql
+Copy-Item .\appsettings.example.json .\appsettings.json
+```
+
+Configurează `ConnectionStrings:DefaultConnection` în `appsettings.json` pentru serverul tău SQL Server, apoi pornește aplicația:
+
+```powershell
+dotnet restore .\SecurityApi.csproj
+dotnet run --project .\SecurityApi.csproj
+```
+
+Profilul HTTP local folosește `http://localhost:5185`. În mediul Development, Swagger este disponibil la `/swagger`.
+
+### Endpoint-uri
 
 | Metodă | Rută | Descriere |
 | --- | --- | --- |
 | `GET` | `/agenti` | Returnează lista agenților. |
-| `POST` | `/agenti` | Adaugă un agent. |
-| `PUT` | `/agenti/{id}` | Actualizează datele agentului cu ID-ul indicat. |
-| `DELETE` | `/agenti/{id}` | Șterge agentul cu ID-ul indicat. |
+| `GET` | `/agenti/{id}` | Returnează agentul cu ID-ul indicat. |
+| `POST` | `/agenti` | Adaugă un agent și returnează `201 Created`. |
+| `PUT` | `/agenti/{id}` | Actualizează datele agentului. |
+| `DELETE` | `/agenti/{id}` | Șterge agentul și returnează `204 No Content`. |
 
-### Adăugarea unui agent
-
-Trimite o cerere `POST /agenti` cu un corp JSON precum:
-
-```json
-{
-  "nume_Complet": "Exemplu Nume",
-  "telefon": "0712345678",
-  "salariu": 4500
-}
-```
-
-Pentru `PUT /agenti/{id}`, folosește același format JSON.
-
-## Pachete principale
-
-- `Microsoft.Data.SqlClient` pentru accesul la SQL Server
-- `Swashbuckle.AspNetCore` pentru documentația Swagger în dezvoltare
+Corpul cererilor POST și PUT folosește câmpurile JSON `nume_Complet`, `telefon` și `salariu`. Datele sunt validate, iar erorile sunt returnate în format Problem Details. Exemplele de cereri sunt în [SecurityApi.http](./SecurityApi.http).

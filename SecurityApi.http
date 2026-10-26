@@ -1,0 +1,31 @@
+@baseUrl = http://localhost:5185
+@agentId = 1
+
+### Get all agents
+GET {{baseUrl}}/agenti
+
+### Get an agent by ID
+GET {{baseUrl}}/agenti/{{agentId}}
+
+### Create an agent
+POST {{baseUrl}}/agenti
+Content-Type: application/json
+
+{
+  "nume_Complet": "Exemplu Nume",
+  "telefon": "+40712345678",
+  "salariu": 4500
+}
+
+### Update an agent
+PUT {{baseUrl}}/agenti/{{agentId}}
+Content-Type: application/json
+
+{
+  "nume_Complet": "Nume Actualizat",
+  "telefon": "+40712345678",
+  "salariu": 4700
+}
+
+### Delete an agent
+DELETE {{baseUrl}}/agenti/{{agentId}}
