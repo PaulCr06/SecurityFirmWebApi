@@ -1,4 +1,4 @@
-# SecurityApi
+# SecurityFirmWebApi
 
 API REST pentru gestionarea agenților de pază, realizat cu ASP.NET Core Minimal APIs și SQL Server.
 

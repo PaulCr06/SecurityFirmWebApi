@@ -83,24 +83,27 @@ app.MapDelete("/agenti/{id}", (int id) =>
     return rowsAffected > 0 ? Results.Ok($"Agentul cu ID {id} a fost șters.") : Results.NotFound("Agentul nu a fost găsit.");
 });
 
-// PUT: Update an existing agent
+// PUT: Actualizează datele agentului identificat prin ID-ul primit în rută.
 app.MapPut("/agenti/{id}", (int id, AgentUpdateDto agentActualizat) =>
 {
+    // Deschide o conexiune nouă la baza de date pentru această operație.
     using var connection = new SqlConnection(connectionString);
     connection.Open();
     
+    // Actualizează coloanele agentului numai pentru înregistrarea cu ID-ul indicat.
     string sql = "UPDATE Agenti_de_Paza SET Nume_Complet = @Nume, Telefon = @Telefon, Salariu = @Salariu WHERE ID_Agent = @Id";
     using var command = new SqlCommand(sql, connection);
     
-    // Bind the URL ID parameter and the body parameters to the SQL query
+    // Asociază ID-ul din rută și valorile din corpul cererii parametrilor interogării SQL.
     command.Parameters.AddWithValue("@Id", id);
     command.Parameters.AddWithValue("@Nume", agentActualizat.Nume_Complet);
     command.Parameters.AddWithValue("@Telefon", agentActualizat.Telefon);
     command.Parameters.AddWithValue("@Salariu", agentActualizat.Salariu);
     
+    // Execută actualizarea și verifică dacă a fost modificată o înregistrare.
     int rowsAffected = command.ExecuteNonQuery();
     
-    // If at least one row was changed, it's a success. Otherwise, the ID wasn't found.
+    // Returnează succes dacă agentul a fost găsit; altfel, răspunde că ID-ul nu există.
     return rowsAffected > 0 ? Results.Ok($"Agentul cu ID {id} a fost actualizat.") : Results.NotFound("Agentul nu a fost găsit.");
 });
 
